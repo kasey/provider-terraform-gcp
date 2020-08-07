@@ -53,7 +53,7 @@ var (
 	ProviderGroupVersionKind = SchemeGroupVersion.WithKind(ProviderKind)
 )
 
-func initializeProvider(ctx context.Context, mr resource.Managed, kube kubeclient.Client) (*client.Provider, error) {
+func initializeProvider(ctx context.Context, mr resource.Managed, ropts *client.RuntimeOptions, kube kubeclient.Client) (*client.Provider, error) {
 	provider := &Provider{}
 	nn := meta.NamespacedNameOf(mr.GetProviderReference())
 	if err := kube.Get(ctx, nn, provider); err != nil {
@@ -72,7 +72,7 @@ func initializeProvider(ctx context.Context, mr resource.Managed, kube kubeclien
 	credentialString := string(secret.Data[provider.Spec.CredentialsSecretRef.Key])
 	cfg := populateConfig(provider, credentialString)
 
-	return client.NewProvider(ProviderName, cfg)
+	return client.NewProvider(ProviderName, ropts.PluginDirectory, cfg)
 }
 
 // Note that this config still needs to have null values filled in with the correct structure
