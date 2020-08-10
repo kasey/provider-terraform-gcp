@@ -23,7 +23,7 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 	"github.com/crossplane/terraform-provider-runtime/pkg/client"
-	"github.com/crossplane/terraform-provider-runtime/pkg/registry"
+	"github.com/crossplane/terraform-provider-runtime/pkg/plugin"
 	"github.com/pkg/errors"
 	"github.com/zclconf/go-cty/cty"
 	v1 "k8s.io/api/core/v1"
@@ -92,10 +92,10 @@ func populateConfig(p *Provider, credentials string) map[string]cty.Value {
 	return merged
 }
 
-func GetProviderEntry() *registry.ProviderEntry {
+func GetProviderEntry() *plugin.ProviderInit {
 	schemeBuilder := &scheme.Builder{GroupVersion: SchemeGroupVersion}
 	schemeBuilder.Register(&Provider{}, &ProviderList{})
-	return &registry.ProviderEntry{
+	return &plugin.ProviderInit{
 		SchemeBuilder: schemeBuilder,
 		Initializer:   initializeProvider,
 	}
