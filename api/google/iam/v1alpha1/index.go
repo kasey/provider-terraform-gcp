@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	"reflect"
 
-	"github.com/crossplane/terraform-provider-runtime/pkg/registry"
+	"github.com/crossplane/terraform-provider-runtime/pkg/plugin"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/scheme"
 )
@@ -44,19 +44,19 @@ var (
 	ServiceAccountTerraformResourceName = "google_service_account"
 )
 
-func ServiceAccountRegistryEntry() *registry.Entry {
+func ServiceAccountFuncTable() *plugin.FuncTable {
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	schemeBuilder := &scheme.Builder{GroupVersion: SchemeGroupVersion}
 	schemeBuilder.Register(&ServiceAccount{}, &ServiceAccountList{})
-	return &registry.Entry{
-		GVK:                       ServiceAccountGroupVersionKind,
-		SchemeBuilder:             schemeBuilder,
-		UnmarshalResourceCallback: UnmarshalServiceAccount,
-		TerraformResourceName:     ServiceAccountTerraformResourceName,
-		EncodeCtyCallback:         AsCtyValue,
-		DecodeCtyCallback:         FromCtyValue,
-		YamlEncodeCallback:        AsYAML,
-		ReconcilerConfigurer:      ConfigureReconciler,
-		ResourceDiffIniter:        diffIniter,
+	return &plugin.FuncTable{
+		GVK:                      ServiceAccountGroupVersionKind,
+		TerraformResourceName:    ServiceAccountTerraformResourceName,
+		SchemeBuilder:            schemeBuilder,
+		ReconcilerConfigurer:     &reconcilerConfigurer{},
+		ResourceMerger:           &resourceMerger{},
+		CtyEncoder:               &ctyEncoder{},
+		CtyDecoder:               &ctyDecoder{},
+		ResourceYAMLUnmarshaller: &ResourceYAMLUnmarshaller{},
+		ResourceYAMLMarshaller:   &ResourceYAMLMarshaller{},
 	}
 }

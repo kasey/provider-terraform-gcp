@@ -3,6 +3,7 @@ package v1alpha1
 import (
 	"fmt"
 
+	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 	xpresource "github.com/crossplane/crossplane-runtime/pkg/resource"
 	"github.com/hashicorp/terraform/providers"
@@ -10,22 +11,17 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func UnmarshalServiceAccount(data []byte) (resource.Managed, error) {
-	var sa resource.Managed = &ServiceAccount{}
-	err := yaml.Unmarshal(data, sa)
+type ctyEncoder struct{}
 
-	return sa, err
-}
-
-func AsCtyValue(resource xpresource.Managed, schema *providers.Schema) (cty.Value, error) {
+func (e *ctyEncoder) EncodeCty(resource xpresource.Managed, schema *providers.Schema) (cty.Value, error) {
 	sa, ok := resource.(*ServiceAccount)
 	if !ok {
 		return cty.NilVal, fmt.Errorf("iam.AsCtyValue received a resource.Managed value which is not a ServiceAccount.")
 	}
 	ctyVal := make(map[string]cty.Value)
-	//id := meta.GetExternalName(resource)
-	//ctyVal["id"] = cty.StringVal(id)
-	ctyVal["id"] = cty.StringVal(sa.Status.AtProvider.Name)
+	id := meta.GetExternalName(resource)
+	ctyVal["id"] = cty.StringVal(id)
+	//ctyVal["id"] = cty.StringVal(sa.Status.AtProvider.Name)
 	ctyVal["account_id"] = cty.StringVal(*sa.Spec.ForProvider.DisplayName)
 	ctyVal["display_name"] = cty.StringVal(*sa.Spec.ForProvider.DisplayName)
 	ctyVal["description"] = cty.StringVal(*sa.Spec.ForProvider.Description)
@@ -47,7 +43,9 @@ func AsCtyValue(resource xpresource.Managed, schema *providers.Schema) (cty.Valu
 	*/
 }
 
-func FromCtyValue(previousManaged resource.Managed, ctyValue cty.Value, schema *providers.Schema) (resource.Managed, error) {
+type ctyDecoder struct{}
+
+func (d *ctyDecoder) DecodeCty(previousManaged resource.Managed, ctyValue cty.Value, schema *providers.Schema) (resource.Managed, error) {
 	prev, ok := previousManaged.(*ServiceAccount)
 	if !ok {
 		return nil, fmt.Errorf("iam.AsCtyValue received a resource.Managed value for previousManaged which is not a ServiceAccount")
@@ -61,15 +59,27 @@ func FromCtyValue(previousManaged resource.Managed, ctyValue cty.Value, schema *
 	new.Spec.ForProvider.AccountID = valMap["account_id"].AsString()
 	new.Spec.ForProvider.Description = stringReference(valMap["description"].AsString())
 	new.Spec.ForProvider.DisplayName = stringReference(valMap["display_name"].AsString())
+	meta.SetExternalName(new, valMap["id"].AsString())
 	return new, nil
 }
 
-func AsYAML(res resource.Managed) ([]byte, error) {
+type ResourceYAMLMarshaller struct{}
+
+func (m *ResourceYAMLMarshaller) MarshalResourceYAML(res resource.Managed) ([]byte, error) {
 	sa, ok := res.(*ServiceAccount)
 	if !ok {
 		return nil, fmt.Errorf("iam.AsYAML received a resource.Managed value which is not a ServiceAccount.")
 	}
 	return yaml.Marshal(sa)
+}
+
+type ResourceYAMLUnmarshaller struct{}
+
+func (u *ResourceYAMLUnmarshaller) UnmarshalResourceYAML(data []byte) (resource.Managed, error) {
+	var sa resource.Managed = &ServiceAccount{}
+	err := yaml.Unmarshal(data, sa)
+
+	return sa, err
 }
 
 /*
