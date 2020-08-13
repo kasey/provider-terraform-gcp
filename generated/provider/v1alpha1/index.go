@@ -92,7 +92,7 @@ func populateConfig(p *Provider, credentials string) map[string]cty.Value {
 	return merged
 }
 
-func GetProviderEntry() *plugin.ProviderInit {
+func GetProviderInit() *plugin.ProviderInit {
 	schemeBuilder := &scheme.Builder{GroupVersion: SchemeGroupVersion}
 	schemeBuilder.Register(&Provider{}, &ProviderList{})
 	return &plugin.ProviderInit{

@@ -1,7 +1,7 @@
-package google
+package generated
 
 import (
-	gcp "github.com/crossplane/provider-terraform-gcp/api/google/v1alpha1"
+	"github.com/crossplane/provider-terraform-gcp/generated/provider/v1alpha1"
 	"github.com/crossplane/terraform-provider-runtime/pkg/plugin"
 )
 
@@ -14,5 +14,5 @@ func Index(idxr *plugin.Indexer) {
 }
 
 func ProviderInit() *plugin.ProviderInit {
-	return gcp.GetProviderInit()
+	return v1alpha1.GetProviderInit()
 }

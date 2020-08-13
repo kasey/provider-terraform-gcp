@@ -8,7 +8,7 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 	"github.com/crossplane/terraform-provider-runtime/pkg/client"
-	"github.com/crossplane/terraform-provider-runtime/pkg/controller/terraform"
+	"github.com/crossplane/terraform-provider-runtime/pkg/controller"
 	"github.com/crossplane/terraform-provider-runtime/pkg/plugin"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -22,7 +22,7 @@ func (c *reconcilerConfigurer) ConfigureReconciler(mgr ctrl.Manager, l logging.L
 		resource.ManagedKind(ServiceAccountGroupVersionKind),
 		managed.WithInitializers(),
 		managed.WithTimeout(time.Duration(3600*time.Second)),
-		managed.WithExternalConnecter(&terraform.Connector{KubeClient: mgr.GetClient(), PluginIndex: idx, Logger: l, Pool: pool}),
+		managed.WithExternalConnecter(&controller.Connector{KubeClient: mgr.GetClient(), PluginIndex: idx, Logger: l, Pool: pool}),
 		managed.WithLogger(l.WithValues("controller", name)),
 		managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name))))
 
