@@ -1,8 +1,7 @@
-package google
+package generated
 
 import (
-	iam "github.com/crossplane/provider-terraform-gcp/api/google/iam/v1alpha1"
-	gcp "github.com/crossplane/provider-terraform-gcp/api/google/v1alpha1"
+	iam "github.com/crossplane/provider-terraform-gcp/generated/iam/v1alpha1"
 	"github.com/crossplane/terraform-provider-runtime/pkg/plugin"
 )
 
@@ -10,5 +9,3 @@ import (
 var ResourceImplementations = []*plugin.Implementation{
 	iam.ServiceAccountImplementation(),
 }
-
-var providerEntry = gcp.GetProviderEntry()

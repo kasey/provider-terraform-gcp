@@ -25,7 +25,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
-	"github.com/crossplane/provider-terraform-gcp/api/google"
+	"github.com/crossplane/provider-terraform-gcp/generated"
 	"github.com/crossplane/terraform-provider-runtime/pkg/client"
 	"github.com/crossplane/terraform-provider-runtime/pkg/plugin"
 
@@ -51,11 +51,11 @@ func main() {
 		ctrl.SetLogger(zl)
 	}
 
+	providerInit := generated.ProviderInit()
 	idxr := plugin.NewIndexer()
-	google.Index(idxr)
+	generated.Index(idxr)
 	idx, err := idxr.BuildIndex()
 	kingpin.FatalIfError(err, "Failed to index provider plugin")
-	providerEntry := google.ProviderInit()
 
 	opts := ctrl.Options{SyncPeriod: syncPeriod}
 	ropts := client.NewRuntimeOptions().
@@ -63,6 +63,6 @@ func main() {
 		WithPoolSize(5)
 	log.Debug("Starting", "sync-period", syncPeriod.String())
 
-	err = controller.StartTerraformManager(idx, providerEntry, opts, ropts, log)
+	err = controller.StartTerraformManager(idx, providerInit, opts, ropts, log)
 	kingpin.FatalIfError(err, "Cannot start the generated terraform controllers")
 }
