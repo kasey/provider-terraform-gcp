@@ -7,8 +7,8 @@ import (
 )
 
 // TODO: output this list somewhere in the codegen pipeline
-var ResourceFuncTables = []*plugin.FuncTable{
-	iam.ServiceAccountFuncTable(),
+var ResourceImplementations = []*plugin.Implementation{
+	iam.ServiceAccountImplementation(),
 }
 
 var providerEntry = gcp.GetProviderEntry()
