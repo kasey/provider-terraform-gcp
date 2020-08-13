@@ -44,11 +44,11 @@ var (
 	ServiceAccountTerraformResourceName = "google_service_account"
 )
 
-func ServiceAccountFuncTable() *plugin.FuncTable {
+func ServiceAccountImplementation() *plugin.Implementation {
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	schemeBuilder := &scheme.Builder{GroupVersion: SchemeGroupVersion}
 	schemeBuilder.Register(&ServiceAccount{}, &ServiceAccountList{})
-	return &plugin.FuncTable{
+	return &plugin.Implementation{
 		GVK:                      ServiceAccountGroupVersionKind,
 		TerraformResourceName:    ServiceAccountTerraformResourceName,
 		SchemeBuilder:            schemeBuilder,
